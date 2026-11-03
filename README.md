@@ -10,6 +10,10 @@ SecondMind is not a therapist, clinical service, or coach telling users what to 
 
 ## Try the prototype
 
+### [Open the live SecondMind demo →](https://jnsuryaprakash.github.io/secondmind-muse/)
+
+![SecondMind home screen showing its four thinking modes](./secondmind-home.jpg)
+
 The interactive prototype is a self-contained web app with no external dependencies:
 
 1. Download or clone the repository.
@@ -21,6 +25,12 @@ Use `index.html?embed=muse` for the embedded Muse presentation. The app exposes 
 - [Muse integration guide](./MUSE_INTEGRATION.md)
 - [Behavioral constitution](./BEHAVIORAL_PRINCIPLES.md)
 - [90-second demo script](./demo-script.md)
+
+### Another View in action
+
+The user shares a frustrating situation. SecondMind separates what is known from the user's interpretation, names what remains unknown, offers a credible alternative, and suggests one optional next step.
+
+![SecondMind Another View workflow showing System 1 to System 2 reasoning](./secondmind-reasoning.jpg)
 
 ## The problem
 
