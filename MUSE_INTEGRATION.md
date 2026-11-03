@@ -48,6 +48,7 @@ Supported modes:
 - `view`
 - `challenge`
 - `decide`
+- `wisdom`
 - `secondlook`
 
 ### SecondMind-to-host messages

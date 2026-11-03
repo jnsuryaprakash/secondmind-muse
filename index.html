@@ -104,7 +104,7 @@
     .section-title { margin: 24px 2px 11px; display: flex; justify-content: space-between; align-items: center; }
     .section-title strong { font-size: 15px; }
     .section-title span { color: var(--muted); font-size: 10px; }
-    .mode-grid { display: grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap: 11px; }
+    .mode-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(165px,1fr)); gap: 11px; }
     .mode-card {
       border: 1px solid var(--line); background: #fff; text-align: left; padding: 15px;
       min-height: 135px; border-radius: 18px; transition: .18s;
@@ -114,6 +114,7 @@
     .mode-card:nth-child(2) .mode-icon { background: #f3edff; }
     .mode-card:nth-child(3) .mode-icon { background: #fff4e6; }
     .mode-card:nth-child(4) .mode-icon { background: #eaf8f2; }
+    .mode-card:nth-child(5) .mode-icon { background: #fff8df; }
     .mode-card b { font-size: 13px; display: block; margin-bottom: 4px; }
     .mode-card small { color: var(--muted); line-height: 1.35; font-size: 10px; }
     .daily {
@@ -258,6 +259,7 @@
             <button class="mode-card" onclick="startMode('view')"><span class="mode-icon">◈</span><b>Another View</b><small>See a credible interpretation you may be missing.</small></button>
             <button class="mode-card" onclick="startMode('challenge')"><span class="mode-icon">⚡</span><b>Challenge my thinking</b><small>Test assumptions and expose uncertainty.</small></button>
             <button class="mode-card" onclick="startMode('decide')"><span class="mode-icon">⚖</span><b>Think it through</b><small>Compare options, trade-offs and outcomes.</small></button>
+            <button class="mode-card" onclick="startMode('wisdom')"><span class="mode-icon">◎</span><b>Wisdom Lens</b><small>Balance courage, compassion and what you can influence.</small></button>
           </div>
 
           <div class="section-title"><strong>Day in Perspective</strong><span>Optional · user controlled</span></div>
@@ -289,6 +291,7 @@
                   <button class="prompt" onclick="usePrompt('I have two good options and I keep going in circles. Help me compare them.')">A decision with trade-offs</button>
                   <button class="prompt" onclick="usePrompt('I am frustrated and want to respond immediately. Give me another view first.')">A reactive moment</button>
                   <button class="prompt" onclick="usePrompt('I keep postponing a habit that matters to me. Help me choose one small next step.')">A habit that is not sticking</button>
+                  <button class="prompt" onclick="startMode('wisdom'); usePrompt('I need to be firm without losing compassion. Help me find the right response.')">Courage with compassion</button>
                 </div>
               </div>
               <div class="card">
@@ -335,12 +338,14 @@
       {t:'Make the next step small', d:'Reduce friction and suggest the smallest meaningful action that matches the user’s current ability and motivation.', s:'B. J. Fogg'},
       {t:'Reinforce agency with evidence', d:'Praise observable choices and progress, not fixed personality traits or empty positivity.', s:'Albert Bandura'},
       {t:'Expose influence and framing', d:'Point out scarcity, social proof, authority, anchoring or loss framing when relevant—without claiming immunity to bias.', s:'Cialdini; Thaler; Kahneman'},
+      {t:'Balance courage with compassion', d:'Help the user face what requires action without dehumanizing themselves or another person. Compassion does not require passivity or agreement.', s:'Wisdom Lens product principle'},
+      {t:'Clarify the sphere of influence', d:'Separate what the user controls, what they may influence and what they must acknowledge as uncertain. Then return agency to one deliberate action.', s:'Wisdom Lens product principle'},
       {t:'Remember minimally', d:'Store user-approved goals and strategies, not raw transcripts, diagnoses, secret scores or profiles of third parties.', s:'Privacy-by-design product rule'},
       {t:'Know when to stop', d:'Do not provide clinical care or crisis counseling. State limitations and direct users toward qualified human support when appropriate.', s:'Safety boundary'},
     ];
 
     const state = { mode:'listen', turns:[], context:null, memory:[] };
-    const modeNames = {listen:'TALK IT THROUGH', view:'ANOTHER VIEW', challenge:'CHALLENGE MY THINKING', decide:'THINK IT THROUGH', secondlook:'SECONDLOOK'};
+    const modeNames = {listen:'TALK IT THROUGH', view:'ANOTHER VIEW', challenge:'CHALLENGE MY THINKING', decide:'THINK IT THROUGH', wisdom:'WISDOM LENS', secondlook:'SECONDLOOK'};
 
     document.getElementById('ruleGrid').innerHTML = rules.map((r,i)=>`<article class="rule"><div class="rule-top"><span class="rule-num">${i+1}</span><div><h3>${r.t}</h3><p>${r.d}</p><cite>${r.s}</cite></div></div></article>`).join('');
 
@@ -401,6 +406,15 @@
       const emotional = /angry|frustrat|dismiss|upset|hate|immediately|again/.test(lower);
       const deciding = /choose|option|decid|should i|trade.?off/.test(lower);
       const habit = /habit|postpon|procrast|keep failing/.test(lower);
+      if (mode === 'wisdom') return {
+        kind:'wisdom',
+        message:'Let’s hold courage and compassion together without pretending they are the same as agreement.',
+        fact: emotional ? 'You are affected by something that felt unfair, dismissive or urgent.' : 'This situation matters enough that you want to respond deliberately.',
+        assumption:'Your strongest first interpretation may contain truth, but it is not the whole field of view.',
+        unknown:'The other person’s full intent, constraints and capacity to respond differently.',
+        alt:'Compassion can explain context without excusing impact; courage can name the impact without attacking the person.',
+        next:'State what you observed, name what you need, and make one clear request that is within your influence.'
+      };
       if (mode === 'listen' && !deciding) return {kind:'listen', message:'It makes sense that this has your attention. What part feels most important right now—the event itself, what it may mean, or what you want to do next?'};
       const fact = emotional ? 'Something happened that felt dismissive or frustrating.' : deciding ? 'You are comparing options and do not yet have a clear preference.' : 'You are trying to make sense of a situation that matters to you.';
       const assumption = emotional ? 'The other person intended disrespect or will continue behaving the same way.' : habit ? 'Difficulty starting means the goal or your motivation is failing.' : 'One interpretation may be receiving more weight than the available evidence supports.';
@@ -413,12 +427,13 @@
     function renderResponse(r) {
       if (r.kind === 'listen') { addBubble(r.message); return; }
       addBubble(r.message);
-      addBubble(`<div class="label">SYSTEM 1 → SYSTEM 2</div>
-        <div class="lens-row"><strong>Known</strong><span>${safe(r.fact)}</span></div>
-        <div class="lens-row"><strong>Interpretation</strong><span>${safe(r.assumption)}</span></div>
+      const wisdom = r.kind === 'wisdom';
+      addBubble(`<div class="label">${wisdom ? 'COURAGE + COMPASSION' : 'SYSTEM 1 → SYSTEM 2'}</div>
+        <div class="lens-row"><strong>${wisdom ? 'What is true' : 'Known'}</strong><span>${safe(r.fact)}</span></div>
+        <div class="lens-row"><strong>${wisdom ? 'Inner story' : 'Interpretation'}</strong><span>${safe(r.assumption)}</span></div>
         <div class="lens-row"><strong>Unknown</strong><span>${safe(r.unknown)}</span></div>
-        <div class="lens-row"><strong>Another view</strong><span>${safe(r.alt)}</span></div>
-        <div class="lens-row"><strong>Possible next step</strong><span>${safe(r.next)}</span></div>`, 'ai', true);
+        <div class="lens-row"><strong>${wisdom ? 'Balanced view' : 'Another view'}</strong><span>${safe(r.alt)}</span></div>
+        <div class="lens-row"><strong>${wisdom ? 'Within influence' : 'Possible next step'}</strong><span>${safe(r.next)}</span></div>`, 'ai', true);
       addBubble('Which part feels accurate, and which part would you change?');
       emit('secondmind:response', r);
     }

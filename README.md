@@ -18,12 +18,13 @@ The interactive prototype is a self-contained web app with no external dependenc
 
 1. Download or clone the repository.
 2. Open [`index.html`](./index.html) directly in a modern browser.
-3. Choose **Talk It Through**, **Another View**, **Challenge My Thinking**, or **Think It Through**.
+3. Choose **Talk It Through**, **Another View**, **Challenge My Thinking**, **Think It Through**, or the optional **Wisdom Lens**.
 
 Use `index.html?embed=muse` for the embedded Muse presentation. The app exposes a small JavaScript and `postMessage` interface for approved context, mode selection, model responses, and host events.
 
 - [Muse integration guide](./MUSE_INTEGRATION.md)
 - [Behavioral constitution](./BEHAVIORAL_PRINCIPLES.md)
+- [Gita Lama to Wisdom Lens design notes](./GITA_LAMA_INTEGRATION.md)
 - [90-second demo script](./demo-script.md)
 
 ### Another View in action
@@ -61,6 +62,10 @@ Respectfully tests an assumption, identifies possible cognitive biases, and asks
 ### Think It Through
 
 Compares options, trade-offs, second-order effects, and alignment with the user's stated goals. The user remains the decision-maker.
+
+### Wisdom Lens
+
+An explicitly selected reflection mode inspired by Gita Lama. It balances courage with compassion, distinguishes impact from intent, clarifies what is within the user's influence, and returns the user to one deliberate action. It is secular by default and never presents spiritual tradition as authority or fact.
 
 ### SecondLook
 
@@ -138,7 +143,7 @@ flowchart TB
 Core components:
 
 - **Moment detector:** Identifies ambiguity, escalation, urgency, and consequential intent.
-- **Conversation mode router:** Selects listening, alternative-view, challenge, decision, or reflection behavior.
+- **Conversation mode router:** Selects listening, alternative-view, challenge, decision, wisdom, or reflection behavior.
 - **Context minimizer:** Redacts unnecessary personal data and sends only relevant context.
 - **System 2 reasoner:** Separates facts, assumptions, unknowns, biases, and goals.
 - **Counterfactual engine:** Simulates plausible outcomes without claiming certainty.
