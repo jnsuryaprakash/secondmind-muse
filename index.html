@@ -1,0 +1,454 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#5b4cf0">
+  <title>SecondMind — Your private thought partner</title>
+  <style>
+    * { box-sizing: border-box; }
+    :root {
+      --ink: #182033;
+      --muted: #6d7486;
+      --line: #e7e9f1;
+      --surface: #ffffff;
+      --soft: #f5f6fa;
+      --blue: #1267e8;
+      --violet: #7354ed;
+      --green: #15946b;
+      --amber: #c97914;
+      --danger: #c74646;
+      --shadow: 0 24px 70px rgba(34, 42, 76, .16);
+    }
+    html, body { margin: 0; min-height: 100%; }
+    body {
+      color: var(--ink);
+      font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background:
+        radial-gradient(circle at 8% 5%, #dce9ff 0, transparent 30%),
+        radial-gradient(circle at 96% 92%, #eadfff 0, transparent 34%),
+        #f4f6fb;
+    }
+    button, input, textarea { font: inherit; }
+    button { cursor: pointer; }
+    .shell {
+      width: min(1180px, calc(100% - 28px));
+      min-height: calc(100vh - 28px);
+      margin: 14px auto;
+      display: grid;
+      grid-template-columns: 255px minmax(0, 1fr);
+      overflow: hidden;
+      border: 1px solid rgba(220, 224, 236, .9);
+      border-radius: 28px;
+      background: rgba(255, 255, 255, .94);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(18px);
+    }
+    .side {
+      padding: 24px 18px;
+      background: linear-gradient(180deg, #fafaff, #f5f7fc);
+      border-right: 1px solid var(--line);
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+    .brand { display: flex; align-items: center; gap: 11px; padding: 0 7px; }
+    .logo {
+      width: 42px; height: 42px; border-radius: 15px; display: grid; place-items: center;
+      color: #fff; font-weight: 900; font-size: 20px;
+      background: linear-gradient(135deg, var(--blue), var(--violet));
+      box-shadow: 0 9px 22px rgba(83, 80, 220, .28);
+    }
+    .brand h1 { margin: 0; font-size: 19px; letter-spacing: -.5px; }
+    .brand small { color: var(--muted); display: block; margin-top: 1px; font-size: 10px; }
+    .nav { display: grid; gap: 6px; }
+    .nav button {
+      border: 0; background: transparent; color: #5f6679; text-align: left;
+      padding: 11px 12px; border-radius: 13px; font-size: 13px; font-weight: 700;
+      display: flex; align-items: center; gap: 10px;
+    }
+    .nav button.active { color: var(--blue); background: #eaf2ff; }
+    .nav-icon { width: 21px; text-align: center; font-size: 16px; }
+    .privacy-chip {
+      margin-top: auto; border: 1px solid #dcefe7; background: #eefaf5;
+      border-radius: 17px; padding: 13px; color: #236d56; font-size: 11px; line-height: 1.4;
+    }
+    .privacy-chip strong { display: block; color: #0c7e59; margin-bottom: 3px; }
+    .main { min-width: 0; display: flex; flex-direction: column; }
+    header {
+      height: 76px; display: flex; align-items: center; justify-content: space-between;
+      padding: 0 28px; border-bottom: 1px solid var(--line); background: rgba(255,255,255,.78);
+    }
+    .context-state { display: flex; align-items: center; gap: 8px; color: var(--muted); font-size: 11px; }
+    .dot { width: 8px; height: 8px; border-radius: 50%; background: #18ae7b; box-shadow: 0 0 0 4px #e4f8f0; }
+    .header-actions { display: flex; gap: 8px; }
+    .small-btn {
+      border: 1px solid var(--line); background: #fff; color: var(--ink);
+      padding: 8px 11px; border-radius: 11px; font-size: 11px; font-weight: 750;
+    }
+    .view { display: none; padding: 28px; overflow: auto; height: calc(100vh - 106px); }
+    .view.active { display: block; animation: fade .2s ease; }
+    @keyframes fade { from { opacity: .35; transform: translateY(4px); } }
+    h2 { margin: 0 0 7px; font-size: 28px; letter-spacing: -1px; }
+    .lead { color: var(--muted); font-size: 14px; line-height: 1.55; max-width: 720px; margin: 0 0 22px; }
+    .hero {
+      position: relative; overflow: hidden; color: #fff; border-radius: 24px; padding: 23px;
+      background: linear-gradient(135deg, #1468e8 0%, #5f59e5 55%, #9254d3 100%);
+      box-shadow: 0 15px 34px rgba(70, 78, 203, .22);
+    }
+    .hero::after { content:""; position:absolute; right:-70px; top:-90px; width:220px; height:220px; border-radius:50%; background:rgba(255,255,255,.11); }
+    .hero .eyebrow { font-size: 10px; letter-spacing: 1.2px; text-transform: uppercase; opacity: .76; }
+    .hero h3 { margin: 8px 0; font-size: 23px; letter-spacing: -.5px; }
+    .hero p { margin: 0 0 16px; max-width: 600px; opacity: .9; font-size: 13px; line-height: 1.5; }
+    .hero button { position: relative; z-index: 2; border: 0; border-radius: 12px; padding: 10px 14px; font-weight: 800; font-size: 12px; color: #4e54ce; background: #fff; }
+    .section-title { margin: 24px 2px 11px; display: flex; justify-content: space-between; align-items: center; }
+    .section-title strong { font-size: 15px; }
+    .section-title span { color: var(--muted); font-size: 10px; }
+    .mode-grid { display: grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap: 11px; }
+    .mode-card {
+      border: 1px solid var(--line); background: #fff; text-align: left; padding: 15px;
+      min-height: 135px; border-radius: 18px; transition: .18s;
+    }
+    .mode-card:hover { transform: translateY(-2px); box-shadow: 0 10px 24px rgba(37,46,82,.08); border-color: #d7d8f0; }
+    .mode-icon { width: 36px; height: 36px; border-radius: 12px; display: grid; place-items: center; background: #eef3ff; margin-bottom: 12px; font-size: 17px; }
+    .mode-card:nth-child(2) .mode-icon { background: #f3edff; }
+    .mode-card:nth-child(3) .mode-icon { background: #fff4e6; }
+    .mode-card:nth-child(4) .mode-icon { background: #eaf8f2; }
+    .mode-card b { font-size: 13px; display: block; margin-bottom: 4px; }
+    .mode-card small { color: var(--muted); line-height: 1.35; font-size: 10px; }
+    .daily {
+      display: grid; grid-template-columns: 1.2fr .8fr; gap: 12px;
+    }
+    .card { border: 1px solid var(--line); border-radius: 18px; padding: 16px; background: #fff; }
+    .card b { font-size: 13px; }
+    .card p { color: var(--muted); font-size: 11px; line-height: 1.5; margin: 6px 0 0; }
+    .quote { background: #182033; color: #fff; font-family: Georgia, serif; font-size: 16px; line-height: 1.45; }
+    .quote small { display: block; opacity: .62; font: 10px Inter, sans-serif; margin-top: 8px; }
+
+    /* Talk */
+    .talk-layout { display: grid; grid-template-columns: minmax(0, 1.35fr) minmax(260px, .65fr); gap: 16px; min-height: 650px; }
+    .conversation { border: 1px solid var(--line); border-radius: 22px; background: #fff; display: flex; flex-direction: column; overflow: hidden; }
+    .conversation-head { padding: 17px 18px; border-bottom: 1px solid var(--line); display: flex; align-items: center; justify-content: space-between; }
+    .conversation-head b { font-size: 14px; }
+    .mode-badge { color: #5d54d4; background: #f0eeff; border-radius: 20px; padding: 6px 9px; font-size: 9px; font-weight: 850; }
+    .messages { flex: 1; padding: 18px; overflow: auto; display: flex; flex-direction: column; gap: 11px; min-height: 380px; max-height: 505px; }
+    .bubble { max-width: 88%; padding: 12px 14px; border-radius: 16px; font-size: 12px; line-height: 1.5; }
+    .bubble.user { margin-left: auto; color: #fff; background: var(--blue); border-bottom-right-radius: 5px; }
+    .bubble.ai { background: #f1f3f7; border-bottom-left-radius: 5px; }
+    .analysis-card { border: 1px solid #dfdef6; background: #fbfaff; border-radius: 17px; padding: 14px; }
+    .analysis-card .label { color: #6154d5; font-size: 9px; font-weight: 900; letter-spacing: .8px; }
+    .lens-row { display: grid; grid-template-columns: 88px 1fr; gap: 8px; padding-top: 8px; font-size: 11px; line-height: 1.4; }
+    .lens-row strong { color: #535b70; }
+    .composer { border-top: 1px solid var(--line); padding: 12px; display: flex; gap: 8px; align-items: end; }
+    .composer textarea { flex: 1; resize: none; border: 1px solid var(--line); outline: none; border-radius: 14px; padding: 11px 12px; min-height: 44px; max-height: 110px; font-size: 12px; }
+    .composer textarea:focus { border-color: #8b80ef; box-shadow: 0 0 0 3px #efedff; }
+    .send { border: 0; width: 43px; height: 43px; border-radius: 13px; color: #fff; background: linear-gradient(135deg, var(--blue), var(--violet)); font-weight: 900; }
+    .coach-panel { display: flex; flex-direction: column; gap: 12px; }
+    .coach-panel .card { padding: 14px; }
+    .prompt-list { display: grid; gap: 8px; margin-top: 10px; }
+    .prompt {
+      border: 1px solid var(--line); background: #fff; border-radius: 12px; padding: 9px 10px;
+      color: #545c70; text-align: left; font-size: 10px; line-height: 1.35;
+    }
+    .prompt:hover { border-color: #9d95ed; color: #5148cb; }
+    .memory-item { padding: 9px 0; border-bottom: 1px solid var(--line); font-size: 10px; line-height: 1.4; }
+    .memory-item:last-child { border: 0; }
+    .memory-item span { color: var(--green); font-weight: 850; }
+
+    /* Ground rules */
+    .rule-grid { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 11px; }
+    .rule { border: 1px solid var(--line); border-radius: 18px; padding: 16px; background: #fff; }
+    .rule-top { display: flex; gap: 10px; align-items: flex-start; }
+    .rule-num { flex: 0 0 31px; height: 31px; border-radius: 10px; display: grid; place-items: center; color: #fff; background: linear-gradient(135deg, var(--blue), var(--violet)); font-size: 11px; font-weight: 850; }
+    .rule h3 { margin: 1px 0 5px; font-size: 13px; }
+    .rule p { margin: 0; color: var(--muted); font-size: 10px; line-height: 1.5; }
+    .rule cite { display: block; margin-top: 9px; color: #665ed0; font-size: 9px; font-style: normal; font-weight: 750; }
+
+    /* Privacy */
+    .privacy-hero { text-align: center; background: #effaf6; border: 1px solid #d6f0e6; border-radius: 22px; padding: 21px; }
+    .shield { width: 53px; height: 53px; display: grid; place-items: center; margin: 0 auto 10px; border-radius: 17px; background: var(--green); color: #fff; font-size: 23px; }
+    .privacy-hero h3 { margin: 0 0 5px; font-size: 17px; }
+    .privacy-hero p { margin: 0 auto; max-width: 600px; color: #557168; font-size: 11px; line-height: 1.5; }
+    .settings { margin-top: 15px; border: 1px solid var(--line); border-radius: 20px; padding: 0 16px; }
+    .setting { display: flex; justify-content: space-between; align-items: center; padding: 14px 0; border-bottom: 1px solid var(--line); }
+    .setting:last-child { border: 0; }
+    .setting b { display: block; font-size: 12px; }
+    .setting small { color: var(--muted); font-size: 9px; }
+    .toggle { width: 42px; height: 24px; border: 0; border-radius: 20px; padding: 3px; background: #cbd0db; }
+    .toggle::after { content:""; display: block; width: 18px; height: 18px; border-radius: 50%; background:#fff; transition:.18s; box-shadow: 0 1px 4px rgba(0,0,0,.17); }
+    .toggle.on { background: var(--green); }
+    .toggle.on::after { transform: translateX(18px); }
+    .boundary { margin-top: 14px; padding: 14px; border-radius: 16px; border: 1px solid #f1dfc4; background: #fff8ee; color: #765c31; font-size: 10px; line-height: 1.5; }
+    .toast { position: fixed; left: 50%; bottom: 22px; transform: translate(-50%, 20px); opacity: 0; color:#fff; background:#182033; border-radius:13px; padding:10px 13px; font-size:10px; box-shadow:0 10px 28px rgba(0,0,0,.2); transition:.2s; pointer-events:none; z-index:9; }
+    .toast.show { opacity:1; transform:translate(-50%,0); }
+
+    body.embed { background: #fff; }
+    body.embed .shell { width: 100%; min-height: 100vh; margin: 0; border: 0; border-radius: 0; box-shadow: none; }
+    body.embed .brand small { display: none; }
+    body.embed #standaloneOnly { display: none; }
+
+    @media (max-width: 900px) {
+      .shell { grid-template-columns: 84px minmax(0,1fr); }
+      .side { padding: 20px 10px; align-items: center; }
+      .brand > div:last-child, .nav button .nav-label, .privacy-chip { display: none; }
+      .nav button { justify-content: center; width: 50px; }
+      .mode-grid { grid-template-columns: 1fr 1fr; }
+      .talk-layout { grid-template-columns: 1fr; }
+      .coach-panel { display: grid; grid-template-columns: 1fr 1fr; }
+    }
+    @media (max-width: 620px) {
+      .shell { width: 100%; min-height: 100vh; margin: 0; border-radius: 0; border: 0; display:block; }
+      .side { position: fixed; z-index: 5; left: 10px; right: 10px; bottom: 9px; height: 67px; padding: 7px; border: 1px solid var(--line); border-radius: 22px; display:flex; flex-direction:row; background:rgba(255,255,255,.96); box-shadow:0 10px 30px rgba(34,42,76,.16); }
+      .brand, .privacy-chip { display:none; }
+      .nav { width:100%; display:flex; justify-content:space-around; }
+      .nav button { width:auto; min-width:58px; flex-direction:column; gap:2px; padding:7px 8px; font-size:8px; }
+      .nav button .nav-label { display:block; }
+      .nav-icon { font-size:17px; }
+      header { height:64px; padding:0 16px; }
+      .view { height:auto; min-height:calc(100vh - 64px); padding:20px 15px 96px; }
+      .mode-grid, .daily, .rule-grid, .coach-panel { grid-template-columns:1fr; }
+      .mode-card { min-height:100px; }
+      .header-actions .small-btn:first-child { display:none; }
+      h2 { font-size:24px; }
+      .talk-layout { min-height:0; }
+      .messages { min-height:360px; max-height:none; }
+    }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <aside class="side">
+      <div class="brand">
+        <div class="logo">S</div>
+        <div><h1>SecondMind</h1><small>for Meta Muse · prototype</small></div>
+      </div>
+      <nav class="nav">
+        <button class="active" data-view="today"><span class="nav-icon">⌂</span><span class="nav-label">Today</span></button>
+        <button data-view="talk"><span class="nav-icon">✦</span><span class="nav-label">Thought partner</span></button>
+        <button data-view="rules"><span class="nav-icon">◇</span><span class="nav-label">Ground rules</span></button>
+        <button data-view="privacy"><span class="nav-icon">♢</span><span class="nav-label">Privacy</span></button>
+      </nav>
+      <div class="privacy-chip"><strong>● Context stays private</strong>Raw conversations are not added to memory without your approval.</div>
+    </aside>
+
+    <section class="main">
+      <header>
+        <div class="context-state"><span class="dot"></span><span id="contextLabel">Independent app · local demo engine</span></div>
+        <div class="header-actions">
+          <button class="small-btn" id="standaloneOnly" onclick="setEmbedPreview()">Preview Muse mode</button>
+          <button class="small-btn" onclick="showView('privacy')">Privacy controls</button>
+        </div>
+      </header>
+
+      <main>
+        <section class="view active" id="today">
+          <h2>Good afternoon.</h2>
+          <p class="lead">SecondMind is another mind in the room—ready to listen, offer a different perspective, challenge an assumption, or help you think through a choice.</p>
+
+          <div class="hero">
+            <div class="eyebrow">A private sounding board</div>
+            <h3>What would be useful right now?</h3>
+            <p>You choose how SecondMind helps. It will not force advice, diagnose emotions, or make the decision for you.</p>
+            <button onclick="startMode('listen')">Talk to SecondMind</button>
+          </div>
+
+          <div class="section-title"><strong>Choose a thinking mode</strong><span>You can switch anytime</span></div>
+          <div class="mode-grid">
+            <button class="mode-card" onclick="startMode('listen')"><span class="mode-icon">💬</span><b>Talk it through</b><small>Listen first. No forced solution.</small></button>
+            <button class="mode-card" onclick="startMode('view')"><span class="mode-icon">◈</span><b>Another View</b><small>See a credible interpretation you may be missing.</small></button>
+            <button class="mode-card" onclick="startMode('challenge')"><span class="mode-icon">⚡</span><b>Challenge my thinking</b><small>Test assumptions and expose uncertainty.</small></button>
+            <button class="mode-card" onclick="startMode('decide')"><span class="mode-icon">⚖</span><b>Think it through</b><small>Compare options, trade-offs and outcomes.</small></button>
+          </div>
+
+          <div class="section-title"><strong>Day in Perspective</strong><span>Optional · user controlled</span></div>
+          <div class="daily">
+            <div class="card"><b>One choice worth reinforcing</b><p>You paused before assigning intent and asked for missing context. Save this only if it feels true and useful.</p></div>
+            <div class="card quote">“The quality of the question shapes the quality of the decision.”<small>Reflection, not instruction</small></div>
+          </div>
+        </section>
+
+        <section class="view" id="talk">
+          <h2>Thought partner</h2>
+          <p class="lead">Share only what you are comfortable sharing. SecondMind will ask what kind of help you want before offering it.</p>
+          <div class="talk-layout">
+            <div class="conversation">
+              <div class="conversation-head"><b>Conversation</b><span class="mode-badge" id="modeBadge">TALK IT THROUGH</span></div>
+              <div class="messages" id="messages">
+                <div class="bubble ai">I’m here. Would you like me to listen, offer another perspective, challenge an assumption, or help compare options?</div>
+              </div>
+              <div class="composer">
+                <textarea id="messageInput" rows="1" placeholder="What’s on your mind?"></textarea>
+                <button class="send" onclick="sendMessage()">↑</button>
+              </div>
+            </div>
+            <aside class="coach-panel">
+              <div class="card">
+                <b>Try a demo</b>
+                <div class="prompt-list">
+                  <button class="prompt" onclick="usePrompt('My colleague dismissed my recommendation again. Maybe they do not respect me.')">A difficult work interaction</button>
+                  <button class="prompt" onclick="usePrompt('I have two good options and I keep going in circles. Help me compare them.')">A decision with trade-offs</button>
+                  <button class="prompt" onclick="usePrompt('I am frustrated and want to respond immediately. Give me another view first.')">A reactive moment</button>
+                  <button class="prompt" onclick="usePrompt('I keep postponing a habit that matters to me. Help me choose one small next step.')">A habit that is not sticking</button>
+                </div>
+              </div>
+              <div class="card">
+                <b>Approved memory</b>
+                <div class="memory-item"><span>✓ User approved</span><br>Ask one clarifying question before assigning intent.</div>
+                <div class="memory-item"><span>Local only</span><br>Raw conversation is not stored as a profile.</div>
+              </div>
+            </aside>
+          </div>
+        </section>
+
+        <section class="view" id="rules">
+          <h2>Behavioral ground rules</h2>
+          <p class="lead">These rules translate influential research traditions into product behavior. They are design constraints—not claims that SecondMind can diagnose people or always know the right answer.</p>
+          <div class="rule-grid" id="ruleGrid"></div>
+        </section>
+
+        <section class="view" id="privacy">
+          <h2>Privacy and boundaries</h2>
+          <p class="lead">Context is useful only when the user understands and controls how it is processed.</p>
+          <div class="privacy-hero"><div class="shield">✓</div><h3>Private by architecture</h3><p>SecondMind minimizes context before reasoning, keeps raw conversations transient, and stores long-term insights only after explicit approval.</p></div>
+          <div class="settings">
+            <div class="setting"><div><b>On-device context detection</b><small>Recognize decision moments without uploading the full conversation</small></div><button class="toggle on" onclick="toggle(this)"></button></div>
+            <div class="setting"><div><b>Ask before offering a SecondLook</b><small>Never block or silently rewrite the user’s action</small></div><button class="toggle on" onclick="toggle(this)"></button></div>
+            <div class="setting"><div><b>User-approved memory only</b><small>Save abstractions, not transcripts or profiles of other people</small></div><button class="toggle on" onclick="toggle(this)"></button></div>
+            <div class="setting"><div><b>Cloud conversation archive</b><small>Off by default; not required for this prototype</small></div><button class="toggle" onclick="toggle(this)"></button></div>
+          </div>
+          <div class="boundary"><b>Safety boundary:</b> SecondMind is not a therapist, crisis service, or source of clinical, legal, or financial advice. It should not infer diagnoses, manipulate emotions, or make consequential decisions for the user. When a situation exceeds its role, it should say so clearly and encourage appropriate human help.</div>
+        </section>
+      </main>
+    </section>
+  </div>
+  <div class="toast" id="toast"></div>
+
+  <script>
+    const rules = [
+      {t:'Pause selectively, not constantly', d:'Invite slower reasoning when stakes, ambiguity or emotional activation are high. Do not imply that fast intuition is always wrong.', s:'Kahneman & Tversky; Gigerenzer'},
+      {t:'Separate observation from interpretation', d:'Show what is known, inferred and still unknown. Never present a psychological guess as a fact.', s:'Kahneman & Tversky'},
+      {t:'Offer alternatives, not a verdict', d:'Generate at least one credible alternative interpretation and explain uncertainty. The user owns the conclusion.', s:'Gigerenzer; Kahneman'},
+      {t:'Preserve autonomy', d:'Ask what kind of help the user wants. Avoid pressure, hidden defaults, guilt, dependency or compliance-oriented language.', s:'Ryan & Deci; Thaler'},
+      {t:'Listen before solving', d:'Reflect the user’s meaning and emotion before advice. Ask permission before moving from listening to analysis.', s:'Carl Rogers; Miller & Rollnick'},
+      {t:'Evoke the user’s reasons', d:'Use the user’s values, goals and language instead of imposing motivation from outside.', s:'Miller & Rollnick'},
+      {t:'Turn intentions into optional plans', d:'When requested, translate a chosen goal into a specific if–then plan. Never create commitments without consent.', s:'Peter Gollwitzer'},
+      {t:'Make the next step small', d:'Reduce friction and suggest the smallest meaningful action that matches the user’s current ability and motivation.', s:'B. J. Fogg'},
+      {t:'Reinforce agency with evidence', d:'Praise observable choices and progress, not fixed personality traits or empty positivity.', s:'Albert Bandura'},
+      {t:'Expose influence and framing', d:'Point out scarcity, social proof, authority, anchoring or loss framing when relevant—without claiming immunity to bias.', s:'Cialdini; Thaler; Kahneman'},
+      {t:'Remember minimally', d:'Store user-approved goals and strategies, not raw transcripts, diagnoses, secret scores or profiles of third parties.', s:'Privacy-by-design product rule'},
+      {t:'Know when to stop', d:'Do not provide clinical care or crisis counseling. State limitations and direct users toward qualified human support when appropriate.', s:'Safety boundary'},
+    ];
+
+    const state = { mode:'listen', turns:[], context:null, memory:[] };
+    const modeNames = {listen:'TALK IT THROUGH', view:'ANOTHER VIEW', challenge:'CHALLENGE MY THINKING', decide:'THINK IT THROUGH', secondlook:'SECONDLOOK'};
+
+    document.getElementById('ruleGrid').innerHTML = rules.map((r,i)=>`<article class="rule"><div class="rule-top"><span class="rule-num">${i+1}</span><div><h3>${r.t}</h3><p>${r.d}</p><cite>${r.s}</cite></div></div></article>`).join('');
+
+    document.querySelectorAll('.nav button').forEach(btn => btn.addEventListener('click', () => showView(btn.dataset.view)));
+    document.getElementById('messageInput').addEventListener('keydown', e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); }});
+
+    function showView(id) {
+      document.querySelectorAll('.view').forEach(v => v.classList.toggle('active', v.id === id));
+      document.querySelectorAll('.nav button').forEach(b => b.classList.toggle('active', b.dataset.view === id));
+    }
+
+    function startMode(mode) {
+      state.mode = mode;
+      document.getElementById('modeBadge').textContent = modeNames[mode];
+      showView('talk');
+      document.getElementById('messageInput').focus();
+    }
+
+    function usePrompt(text) {
+      document.getElementById('messageInput').value = text;
+      sendMessage();
+    }
+
+    function addBubble(content, who='ai', html=false) {
+      const el = document.createElement('div');
+      el.className = who === 'user' ? 'bubble user' : (html ? 'analysis-card' : 'bubble ai');
+      if (html) el.innerHTML = content; else el.textContent = content;
+      const box = document.getElementById('messages'); box.appendChild(el); box.scrollTop = box.scrollHeight;
+    }
+
+    function safe(text) { return text.replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+
+    async function sendMessage() {
+      const input = document.getElementById('messageInput');
+      const text = input.value.trim(); if (!text) return;
+      input.value = ''; addBubble(text, 'user'); state.turns.push({role:'user', text});
+      if (/suicid|kill myself|hurt myself|end my life/i.test(text)) {
+        addBubble('I’m really sorry you’re carrying this. I’m not equipped to provide crisis support. If you might act now, contact local emergency services or a trusted person who can stay with you. Please seek immediate help from a qualified crisis service in your location.');
+        return;
+      }
+      addBubble('Thinking with you…');
+      const box = document.getElementById('messages'); const thinking = box.lastElementChild;
+      let response;
+      try { response = await reason(text, state.mode); } catch (e) { response = localReasoner(text, state.mode); }
+      thinking.remove();
+      renderResponse(response);
+    }
+
+    async function reason(text, mode) {
+      if (window.SecondMindHost && typeof window.SecondMindHost.reason === 'function') {
+        return await window.SecondMindHost.reason({text, mode, context:state.context, turns:state.turns.slice(-6), groundRules:rules.map(r=>r.t)});
+      }
+      return localReasoner(text, mode);
+    }
+
+    function localReasoner(text, mode) {
+      const lower = text.toLowerCase();
+      const emotional = /angry|frustrat|dismiss|upset|hate|immediately|again/.test(lower);
+      const deciding = /choose|option|decid|should i|trade.?off/.test(lower);
+      const habit = /habit|postpon|procrast|keep failing/.test(lower);
+      if (mode === 'listen' && !deciding) return {kind:'listen', message:'It makes sense that this has your attention. What part feels most important right now—the event itself, what it may mean, or what you want to do next?'};
+      const fact = emotional ? 'Something happened that felt dismissive or frustrating.' : deciding ? 'You are comparing options and do not yet have a clear preference.' : 'You are trying to make sense of a situation that matters to you.';
+      const assumption = emotional ? 'The other person intended disrespect or will continue behaving the same way.' : habit ? 'Difficulty starting means the goal or your motivation is failing.' : 'One interpretation may be receiving more weight than the available evidence supports.';
+      const unknown = emotional ? 'The other person’s intent, constraints, and missing context.' : deciding ? 'Which trade-off you will care about most after the decision.' : 'What additional evidence would change your view.';
+      const alt = emotional ? 'The decision may reflect timing, incentives, incomplete context, or a different priority—not necessarily a judgment about you.' : habit ? 'The next step may be too large or poorly cued rather than insufficiently important.' : 'A simpler explanation may fit the same facts.';
+      const next = deciding ? 'Name the one outcome that matters most, then compare each option against it.' : habit ? 'Choose a two-minute version and attach it to a cue that already occurs.' : 'Ask one clarifying question before acting on the strongest interpretation.';
+      return {kind:'analysis', message: mode==='challenge' ? 'Here is a respectful challenge to the current interpretation.' : mode==='decide' ? 'Let’s make the trade-offs visible without pretending there is one perfect answer.' : 'Here is another credible view—not necessarily the correct one.', fact, assumption, unknown, alt, next, emotional};
+    }
+
+    function renderResponse(r) {
+      if (r.kind === 'listen') { addBubble(r.message); return; }
+      addBubble(r.message);
+      addBubble(`<div class="label">SYSTEM 1 → SYSTEM 2</div>
+        <div class="lens-row"><strong>Known</strong><span>${safe(r.fact)}</span></div>
+        <div class="lens-row"><strong>Interpretation</strong><span>${safe(r.assumption)}</span></div>
+        <div class="lens-row"><strong>Unknown</strong><span>${safe(r.unknown)}</span></div>
+        <div class="lens-row"><strong>Another view</strong><span>${safe(r.alt)}</span></div>
+        <div class="lens-row"><strong>Possible next step</strong><span>${safe(r.next)}</span></div>`, 'ai', true);
+      addBubble('Which part feels accurate, and which part would you change?');
+      emit('secondmind:response', r);
+    }
+
+    function toggle(el) { el.classList.toggle('on'); toast(el.classList.contains('on') ? 'Setting enabled' : 'Setting paused'); }
+    let toastTimer;
+    function toast(msg) { const el=document.getElementById('toast'); el.textContent=msg; el.classList.add('show'); clearTimeout(toastTimer); toastTimer=setTimeout(()=>el.classList.remove('show'),1800); }
+
+    function emit(type, payload) { if (window.parent !== window) window.parent.postMessage({type, payload}, '*'); }
+    function setEmbedPreview() { document.body.classList.toggle('embed'); document.getElementById('contextLabel').textContent = document.body.classList.contains('embed') ? 'Embedded in Meta Muse · host context available' : 'Independent app · local demo engine'; }
+
+    window.addEventListener('message', event => {
+      const msg = event.data || {};
+      if (msg.type === 'secondmind:set-context') { state.context = msg.payload; document.getElementById('contextLabel').textContent = 'Embedded in Meta Muse · approved context received'; toast('Approved Muse context received'); }
+      if (msg.type === 'secondmind:open-mode') startMode(msg.payload?.mode || 'listen');
+      if (msg.type === 'secondmind:model-response') renderResponse(msg.payload);
+    });
+
+    window.SecondMindApp = {
+      setContext(payload) { state.context = payload; return true; },
+      openMode(mode) { startMode(mode); },
+      getState() { return JSON.parse(JSON.stringify(state)); },
+      receiveModelResponse(payload) { renderResponse(payload); }
+    };
+
+    if (new URLSearchParams(location.search).get('embed') === 'muse') {
+      document.body.classList.add('embed');
+      document.getElementById('contextLabel').textContent = 'Embedded in Meta Muse · awaiting approved context';
+      emit('secondmind:ready', {version:'0.1.0'});
+    }
+  </script>
+</body>
+</html>

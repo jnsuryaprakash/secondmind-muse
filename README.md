@@ -8,6 +8,20 @@ SecondMind is a context-aware AI thought partner for the everyday moments when a
 
 SecondMind is not a therapist, clinical service, or coach telling users what to do. It is a private sounding board—another mind in the room when the user feels stuck, uncertain, reactive, or simply wants to think more clearly.
 
+## Try the prototype
+
+The interactive prototype is a self-contained web app with no external dependencies:
+
+1. Download or clone the repository.
+2. Open [`index.html`](./index.html) directly in a modern browser.
+3. Choose **Talk It Through**, **Another View**, **Challenge My Thinking**, or **Think It Through**.
+
+Use `index.html?embed=muse` for the embedded Muse presentation. The app exposes a small JavaScript and `postMessage` interface for approved context, mode selection, model responses, and host events.
+
+- [Muse integration guide](./MUSE_INTEGRATION.md)
+- [Behavioral constitution](./BEHAVIORAL_PRINCIPLES.md)
+- [90-second demo script](./demo-script.md)
+
 ## The problem
 
 People rarely struggle because they have no information. They struggle because they are too close to the situation:
